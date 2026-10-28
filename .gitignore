@@ -1,0 +1,7 @@
+/dns-monitor.json
+/servers.json
+/var/*
+!/var/.gitkeep
+*.log
+*.lock
+*.tmp

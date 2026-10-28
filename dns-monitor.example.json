@@ -1,0 +1,37 @@
+{
+	"dns_manager": {
+		"php_binary": "/usr/bin/php",
+		"script": "../dns-manager/dns-manager",
+		"config": "../dns-manager/dns-manager.example.json",
+		"zone": "example.org",
+		"timeout_sec": 600
+	},
+	"servers_file": "servers.example.json",
+	"state_file": "var/state.example.json",
+	"lock_file": "var/monitor.example.lock",
+	"log_file": "var/monitor.example.log",
+	"check": {
+		"scheme": "http",
+		"port": 80,
+		"path": "/replica_status.php",
+		"timeout_sec": 3,
+		"connect_timeout_sec": 2,
+		"expected_status": 200,
+		"expected_body": "OK",
+		"max_body_bytes": 65536
+	},
+	"apply_on_first_run": false,
+	"allow_all_down_publish": false,
+	"internet_check": {
+		"enabled": true,
+		"host": "www.google.com",
+		"timeout_sec": 3,
+		"ping_binary": "/usr/bin/ping"
+	},
+	"notify_script": null,
+	"notify_timeout_sec": 30,
+	"retry": {
+		"down_after_failures": 3,
+		"up_after_successes": 2
+	}
+}
