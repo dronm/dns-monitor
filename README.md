@@ -1,8 +1,8 @@
 # dns-monitor
 
-A standalone PHP CLI that checks backend health, enables or disables their DNS records through `dns-manager`, and calls a configured notification script when availability changes.
+A standalone PHP CLI that checks backend health, enables or disables their DNS records through [dns-manager](https://github.com/dronm/dns-manager), and calls a configured notification script when availability changes.
 
-Each invocation performs one monitoring cycle. Run it from cron at your preferred interval. `dns-manager` manages the annotated zone source, TSIG authentication, BIND updates, and authoritative verification.
+Each invocation performs one monitoring cycle. Run it from cron at your preferred interval. [dns-manager](https://github.com/dronm/dns-manager) manages the annotated zone source, TSIG authentication, BIND updates, and authoritative verification.
 
 ## Behavior
 
@@ -14,14 +14,14 @@ Each monitoring cycle follows these rules:
 - With `apply_on_first_run=false`, the first cycle saves an initial baseline without publishing DNS or notifying. A newly encountered server starts with its first observed availability; startup does not wait for the retry threshold.
 - With `allow_all_down_publish=false`, it publishes nothing when every configured server is effectively unavailable. This uses availability after the consecutive-check thresholds, not just the latest HTTP response.
 - A process lock prevents overlapping cycles using the same lock file.
-- An effective change triggers publication of every configured alias. Unchanged cycles update observations without repeatedly invoking `dns-manager`.
+- An effective change triggers publication of every configured alias. Unchanged cycles update observations without repeatedly invoking [dns-manager](https://github.com/dronm/dns-manager).
 - Notifications use the messages `server ALIAS enabled` and `server ALIAS disabled`.
 
 For example, a server that was available remains effectively available after its first and second failed observations. Its third consecutive failure requests `disable`. Two later consecutive successes request `enable`.
 
 ### Publication and retries
 
-The monitor invokes the PHP `dns-manager` CLI for each configured alias:
+The monitor invokes the PHP [dns-manager](https://github.com/dronm/dns-manager) CLI for each configured alias:
 
 ```bash
 /usr/bin/php /opt/dns-manager/dns-manager \
@@ -39,13 +39,13 @@ Observations and counters are saved during publication failures and all-down blo
 
 - PHP CLI 8.1 or newer with the cURL extension and `proc_open()` enabled.
 - Linux/Unix filesystem permissions and locking; the enabled internet check uses Linux `iputils`-style `ping` options.
-- The separate PHP `dns-manager` project, already configured for the intended BIND zone.
-- The dependencies required by `dns-manager`, including `nsupdate`, `named-checkzone`, `dig`, and its update credential.
+- The separate PHP [dns-manager](https://github.com/dronm/dns-manager) project, already configured for the intended BIND zone.
+- The dependencies required by [dns-manager](https://github.com/dronm/dns-manager), including `nsupdate`, `named-checkzone`, `dig`, and its update credential.
 - An executable notification script if notifications are enabled.
 
-No Composer packages or PHP framework are required. DNS operations are delegated to the separate `dns-manager` CLI.
+No Composer packages or PHP framework are required. DNS operations are delegated to the separate [dns-manager](https://github.com/dronm/dns-manager) CLI.
 
-Run it as the account already able to run `dns-manager` successfully. That account needs access to the manager configuration, its annotated zone source and source directory, its lock file, and its TSIG key. It also needs write access to the monitor's state, lock, and log files and their parent directories. Normal operation does not require running the monitor as root.
+Run it as the account already able to run [dns-manager](https://github.com/dronm/dns-manager) successfully. That account needs access to the manager configuration, its annotated zone source and source directory, its lock file, and its TSIG key. It also needs write access to the monitor's state, lock, and log files and their parent directories. Normal operation does not require running the monitor as root.
 
 ## Files and configuration
 
@@ -118,7 +118,7 @@ Each alias must exactly match an alias in the manager's annotated zone source, s
 
 The IP controls the health probe. DNS record definitions are stored in the manager's source file. Changing an inventory IP does not rewrite record RDATA; it causes a new publication using the configured alias definitions. Update the manager's source through its documented workflow when record values need to change.
 
-Removing an alias from the inventory stops monitoring it. It does not disable its records. Use `dns-manager` explicitly to withdraw that alias before removing it if withdrawal is intended.
+Removing an alias from the inventory stops monitoring it. It does not disable its records. Use [dns-manager](https://github.com/dronm/dns-manager) explicitly to withdraw that alias before removing it if withdrawal is intended.
 
 The monitor controls the enabled state of its configured aliases. A later publication can therefore replace a manual enable/disable decision for those aliases. Pause the monitor when you need to hold a different manual state during maintenance.
 
@@ -127,7 +127,7 @@ The monitor controls the enabled state of its configured aliases. A later public
 | Setting | Meaning |
 | --- | --- |
 | `dns_manager.php_binary` | PHP executable used to launch the manager |
-| `dns_manager.script` | Path to the PHP `dns-manager` entry point |
+| `dns_manager.script` | Path to the PHP [dns-manager](https://github.com/dronm/dns-manager) entry point |
 | `dns_manager.config` | Path to the manager's own JSON configuration |
 | `dns_manager.zone` | Zone passed to every manager invocation |
 | `dns_manager.timeout_sec` | Deadline for one entire manager invocation; default `600` seconds |
@@ -258,7 +258,7 @@ php tests/adapters.php
 
 The engine suite uses temporary state files and injected probes, manager calls, and notifications. It covers startup, thresholds, recovery, guards, pending publication, state persistence, and failure behavior. The configuration suite checks invalid inputs, relative paths, and overlapping files. The adapter suite uses temporary command fixtures and local HTTP listeners to check real process invocation and HTTP handling; it requires cURL and permission to open loopback sockets. It never calls the configured production manager or notification script.
 
-With `dns-manager` installed beside this project and BIND tools available, run the full local integration suite:
+With [dns-manager](https://github.com/dronm/dns-manager) installed beside this project and BIND tools available, run the full local integration suite:
 
 ```bash
 php tests/end_to_end.php
@@ -268,4 +268,4 @@ It starts temporary BIND and HTTP servers bound only to loopback, generates a te
 
 For a different manager location, set `DNS_MONITOR_MANAGER_SCRIPT` to its entry point. Tool paths can be supplied with `DNS_MONITOR_NAMED_BINARY`, `DNS_MONITOR_DIG_BINARY`, `DNS_MONITOR_NSUPDATE_BINARY`, and `DNS_MONITOR_CHECKZONE_BINARY`; otherwise the test uses `PATH`. If PHP cURL is loaded explicitly with `-d extension=...` rather than the normal CLI configuration, also set `DNS_MONITOR_CURL_EXTENSION` to the extension's absolute path so child monitor processes load it.
 
-For changes to tagged DNS records, follow the `dns-manager` documentation, including its distinction between the annotated source and BIND's live zone data.
+For changes to tagged DNS records, follow the [dns-manager](https://github.com/dronm/dns-manager) documentation, including its distinction between the annotated source and BIND's live zone data.
